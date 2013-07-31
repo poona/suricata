@@ -1091,6 +1091,30 @@ static void SigBuildAddressMatchArray(Signature *s) {
     }
 }
 
+static void SigRearrangeKeywords(Signature *s)
+{
+    SigMatch *sm;
+    int sm_list;
+
+    for (sm_list = 0; sm_list < DETECT_SM_LIST_MAX; sm_list++) {
+        for (sm = s->sm_lists[sm_list]; sm != NULL; sm = sm->next) {
+            if (sm->type != DETECT_PCRE)
+                continue;
+
+            DetectPcreData *pd = (DetectPcreData *)sm->ctx;
+            if (pd->flags & DETECT_PCRE_RELATIVE ||
+                pd->flags & DETECT_PCRE_RELATIVE_NEXT) {
+                continue;
+            }
+
+            SigMatchRemoveSMFromList(s, sm, sm_list);
+            SigMatchAppendSMToList(s, sm, sm_list);
+        }
+    }
+
+    return;
+}
+
 /**
  *  \internal
  *  \brief validate a just parsed signature for internal inconsistencies
@@ -1100,7 +1124,8 @@ static void SigBuildAddressMatchArray(Signature *s) {
  *  \retval 0 invalid
  *  \retval 1 valid
  */
-int SigValidate(DetectEngineCtx *de_ctx, Signature *s) {
+static int SigValidate(DetectEngineCtx *de_ctx, Signature *s)
+{
     uint32_t u = 0;
     uint32_t sig_flags = 0;
     SigMatch *sm, *pm;
@@ -1409,6 +1434,8 @@ static Signature *SigInitHelper(DetectEngineCtx *de_ctx, char *sigstr,
         sig->init_flags & SIG_FLAG_INIT_PACKET ? "set" : "not set");
 
     SigBuildAddressMatchArray(sig);
+
+    SigRearrangeKeywords(sig);
 
     /* validate signature, SigValidate will report the error reason */
     if (SigValidate(de_ctx, sig) == 0) {
