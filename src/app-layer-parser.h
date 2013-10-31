@@ -443,7 +443,7 @@ int AppLayerAlprotoSupportsTxs(uint16_t alproto);
 void AppLayerTriggerRawStreamReassembly(Flow *);
 
 /**
- * \brief Informs if the specified alproto's parser is enabled.
+ * \brief Informs if the specified alproto's parser is enabled in the conf.
  *
  * \param alproto Character string holding the alproto name.
  */
@@ -468,10 +468,14 @@ int AppLayerGetEventInfo(uint16_t alproto, const char *event_name,
 
 /***** Utility *****/
 
-void AppLayerParseProbingParserPorts(const char *al_proto_name, uint16_t al_proto,
-                                     uint16_t min_depth, uint16_t max_depth,
-                                     ProbingParserFPtr ProbingParser);
+//void AppLayerParseProbingParserPorts(const char *al_proto_name, uint16_t al_proto,
+//                                     uint16_t min_depth, uint16_t max_depth,
+//                                     ProbingParserFPtr ProbingParser);
 
+
+/***** Anoop *****/
+void *AlpGetCtxThread(void *ctx);
+void AlpDestroyCtxThread(void *tctx);
 
 /***** Unittests *****/
 

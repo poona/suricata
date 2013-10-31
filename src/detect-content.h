@@ -63,6 +63,8 @@
 
 #include "util-spm-bm.h"
 
+/* \todo Update the structure to content as a part of the same structure.  Should
+ *       improve cache performance. */
 typedef struct DetectContentData_ {
     uint8_t *content;
     uint8_t content_len;
